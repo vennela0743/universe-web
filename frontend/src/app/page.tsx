@@ -1,6 +1,8 @@
 "use client";
 
+import { useAuth } from "@/contexts/AuthContext";
 import type { CSSProperties } from "react";
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./page.module.css";
 
@@ -50,6 +52,7 @@ const spaces = [
 ];
 
 export default function Home() {
+  const { user } = useAuth();
   const [angle, setAngle] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const dragging = useRef(false);
@@ -234,15 +237,27 @@ export default function Home() {
             From Conversations to Collaborations
           </div>
         </div>
-        <button type="button" className={styles.profileButton}>
-          <span className={styles.profileIcon} aria-hidden="true">
-            <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
-            </svg>
-          </span>
-          <span>Profile</span>
-        </button>
+        {user ? (
+          <Link href="/profile" className={styles.profileButton}>
+            <span className={styles.profileIcon} aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
+              </svg>
+            </span>
+            <span>{user.displayName}</span>
+          </Link>
+        ) : (
+          <Link href="/login" className={styles.profileButton}>
+            <span className={styles.profileIcon} aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
+              </svg>
+            </span>
+            <span>Login</span>
+          </Link>
+        )}
       </header>
 
       <main className={styles.main}>
