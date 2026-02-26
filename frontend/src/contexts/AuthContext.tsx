@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import * as authApi from "@/lib/auth-api";
-import type { AuthUser } from "@/types/auth";
+import type { AuthUser, AuthResponse } from "@/types/auth";
 
 const STORAGE_KEY = "universe_auth";
 
@@ -20,11 +20,29 @@ function loadStored(): { user: AuthUser; token: string } | null {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const data = JSON.parse(raw) as { user: AuthUser; token: string };
-    if (data?.token && data?.user?.userId) return data;
+    if (data?.token && data?.user?.userId) {
+      if (!data.user.role) data.user.role = "STUDENT";
+      return data;
+    }
   } catch {
     // ignore
   }
   return null;
+}
+
+function userFromAuthResponse(res: AuthResponse): AuthUser {
+  const universitySpace =
+    res.universitySpaceId && res.universitySpaceName != null && res.universitySpaceDomain != null
+      ? { id: res.universitySpaceId, name: res.universitySpaceName, domain: res.universitySpaceDomain }
+      : null;
+  const role = (res.role === "ADMIN" ? "ADMIN" : "STUDENT") as AuthUser["role"];
+  return {
+    userId: res.userId,
+    email: res.email,
+    displayName: res.displayName,
+    role,
+    universitySpace,
+  };
 }
 
 function saveStored(user: AuthUser, token: string) {
@@ -50,6 +68,7 @@ interface AuthContextValue {
   initialized: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, displayName: string) => Promise<void>;
+  setAuthData: (authResponse: AuthResponse) => void;
   logout: () => void;
 }
 
@@ -74,11 +93,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     setLoading(true);
     try {
       const res = await authApi.login({ email, password });
-      const authUser: AuthUser = {
-        userId: res.userId,
-        email: res.email,
-        displayName: res.displayName,
-      };
+      const authUser = userFromAuthResponse(res);
       setUser(authUser);
       setToken(res.token);
       saveStored(authUser, res.token);
@@ -92,11 +107,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
       setLoading(true);
       try {
         const res = await authApi.register({ email, password, displayName });
-        const authUser: AuthUser = {
-          userId: res.userId,
-          email: res.email,
-          displayName: res.displayName,
-        };
+        const authUser = userFromAuthResponse(res);
         setUser(authUser);
         setToken(res.token);
         saveStored(authUser, res.token);
@@ -106,6 +117,13 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     },
     []
   );
+
+  const setAuthData = useCallback((authResponse: AuthResponse) => {
+    const authUser = userFromAuthResponse(authResponse);
+    setUser(authUser);
+    setToken(authResponse.token);
+    saveStored(authUser, authResponse.token);
+  }, []);
 
   const logout = useCallback(() => {
     setUser(null);
@@ -121,9 +139,10 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
       initialized,
       login,
       register,
+      setAuthData,
       logout,
     }),
-    [user, token, loading, initialized, login, register, logout]
+    [user, token, loading, initialized, login, register, setAuthData, logout]
   );
 
   return (

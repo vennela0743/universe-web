@@ -1,8 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
+  images: {
+    remotePatterns: [],
+    dangerouslyAllowSVG: false,
+    unoptimized: true,
+  },
 };
 
 export default nextConfig;

@@ -3,7 +3,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "../auth.module.css";
 
 export default function LoginPage() {
@@ -13,8 +13,13 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (initialized && user) {
+      router.replace("/space");
+    }
+  }, [initialized, user, router]);
+
   if (initialized && user) {
-    router.replace("/");
     return null;
   }
 
@@ -27,9 +32,13 @@ export default function LoginPage() {
     }
     try {
       await login(email.trim(), password);
-      router.replace("/");
+      router.replace("/space");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed.");
+      if (err instanceof TypeError && err.message === "Failed to fetch") {
+        setError("Cannot reach the server. Is the backend running? Start it with: cd backend && ./mvnw spring-boot:run");
+      } else {
+        setError(err instanceof Error ? err.message : "Login failed.");
+      }
     }
   }
 
@@ -76,6 +85,9 @@ export default function LoginPage() {
                 minLength={8}
               />
             </label>
+            <Link href="/forgot-password" className={styles.forgotPasswordLink}>
+              Forgot password?
+            </Link>
             <button
               type="submit"
               disabled={loading}

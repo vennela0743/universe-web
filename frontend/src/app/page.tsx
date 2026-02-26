@@ -11,43 +11,29 @@ const spaces = [
     title: "Connect Space",
     description: "Talk, share, and express freely.",
     short: "Connect",
+    path: "/space/connect",
     planet: { name: "Mercury", color: "#9ca3af", size: 80 },
   },
   {
     title: "Pro-Space",
     description: "Turn ideas into projects.",
     short: "Pro",
+    path: "/space/pro",
     planet: { name: "Venus", color: "#facc15", size: 74 },
   },
   {
-    title: "Group Spaces",
-    description: "Clubs, departments, organizations.",
-    short: "Group",
+    title: "Event Space",
+    description: "Hackathons and campus events.",
+    short: "Events",
+    path: "/space/events",
     planet: { name: "Earth", color: "#38bdf8", size: 78 },
-  },
-  {
-    title: "Mystery Chat",
-    description: "Open, safe, protected identity.",
-    short: "Mystery",
-    planet: { name: "Mars", color: "#ef4444", size: 74 },
   },
   {
     title: "DM / Chat",
     description: "1:1 or small-group messaging.",
     short: "DM",
-    planet: { name: "Jupiter", color: "#f59e0b", size: 102 },
-  },
-  {
-    title: "Discover Space",
-    description: "Trending posts and people.",
-    short: "Discover",
-    planet: { name: "Uranus", color: "#22d3ee", size: 84 },
-  },
-  {
-    title: "Event Space",
-    description: "Hackathons and campus events.",
-    short: "Event",
-    planet: { name: "Neptune", color: "#6366f1", size: 86 },
+    path: "/space/dm",
+    planet: { name: "Mars", color: "#ef4444", size: 90 },
   },
 ];
 
@@ -175,8 +161,6 @@ export default function Home() {
 
     updateOrbit();
 
-    // More responsive than window resize: reacts to container size changes
-    // (mobile address bar, split view, sidebar changes, etc.)
     const el = systemRef.current;
     if (!el) return;
 
@@ -194,7 +178,7 @@ export default function Home() {
 
     g.addEventListener?.("resize", updateOrbit);
     return () => g.removeEventListener?.("resize", updateOrbit);
-  }, []);
+  }, [maxPlanetSize]);
 
   useEffect(() => {
     const headerEl = headerRef.current;
@@ -354,7 +338,9 @@ export default function Home() {
             </button>
           </div>
           <div className={styles.panelBody}>
-            Space content will live here soon.
+            <Link href={spaces[selectedIndex].path} className={styles.taskbarLabel} style={{ fontWeight: 600, color: "var(--planet-color, #facc15)" }}>
+              Enter {spaces[selectedIndex].short} →
+            </Link>
           </div>
         </section>
       )}
@@ -368,15 +354,15 @@ export default function Home() {
 
       <nav className={styles.taskbar} aria-label="Bottom taskbar">
         <div className={styles.taskbarInner}>
-          <button type="button" className={styles.taskbarItem}>
+          <Link href="/" className={styles.taskbarItem}>
             <span className={styles.taskbarIcon} aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
                 <path d="M4 11.5 12 4l8 7.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1z" />
               </svg>
             </span>
             <span className={styles.taskbarLabel}>Home</span>
-          </button>
-          <button type="button" className={styles.taskbarItem}>
+          </Link>
+          <Link href="/space" className={styles.taskbarItem}>
             <span className={styles.taskbarIcon} aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
                 <circle cx="12" cy="12" r="3.2" />
@@ -384,25 +370,37 @@ export default function Home() {
               </svg>
             </span>
             <span className={styles.taskbarLabel}>Spaces</span>
-          </button>
-          <button type="button" className={styles.taskbarItem}>
+          </Link>
+          <Link href="/space/connect" className={styles.taskbarItem}>
             <span className={styles.taskbarIcon} aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-                <circle cx="11" cy="11" r="7" />
-                <path d="M20 20l-3.2-3.2" />
+                <circle cx="9" cy="7" r="3" />
+                <circle cx="15" cy="7" r="3" />
+                <path d="M3 18v-1a4 4 0 0 1 4-4h2m4 0h2a4 4 0 0 1 4 4v1" />
               </svg>
             </span>
-            <span className={styles.taskbarLabel}>Discover</span>
-          </button>
-          <button type="button" className={styles.taskbarItem}>
-            <span className={styles.taskbarIcon} aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-                <path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 7h18s-3 0-3-7" />
-                <path d="M10 21a2 2 0 0 0 4 0" />
-              </svg>
-            </span>
-            <span className={styles.taskbarLabel}>Alerts</span>
-          </button>
+            <span className={styles.taskbarLabel}>Connect</span>
+          </Link>
+          {user ? (
+            <Link href="/profile" className={styles.taskbarItem}>
+              <span className={styles.taskbarIcon} aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
+                </svg>
+              </span>
+              <span className={styles.taskbarLabel}>Profile</span>
+            </Link>
+          ) : (
+            <Link href="/login" className={styles.taskbarItem}>
+              <span className={styles.taskbarIcon} aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3" />
+                </svg>
+              </span>
+              <span className={styles.taskbarLabel}>Login</span>
+            </Link>
+          )}
         </div>
       </nav>
     </div>

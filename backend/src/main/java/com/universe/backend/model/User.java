@@ -16,6 +16,8 @@ public class User {
     private String passwordHash;
     private String displayName;
     private String universityDomain;
+    private String universitySpaceId;
+    private String role; // ADMIN, STUDENT
     private boolean verified;
     private Instant createdAt;
     private Instant updatedAt;
@@ -58,6 +60,22 @@ public class User {
 
     public void setUniversityDomain(String universityDomain) {
         this.universityDomain = universityDomain;
+    }
+
+    public String getUniversitySpaceId() {
+        return universitySpaceId;
+    }
+
+    public void setUniversitySpaceId(String universitySpaceId) {
+        this.universitySpaceId = universitySpaceId;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public boolean isVerified() {
