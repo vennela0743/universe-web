@@ -3,11 +3,11 @@
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactElement } from "react";
 import { SPACE_HOME_PATH, SPACE_ROUTES } from "./space-nav";
 import styles from "../page.module.css";
 
-const ICONS: Record<string, JSX.Element> = {
+const ICONS: Record<string, ReactElement> = {
   home: (
     <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
       <path d="M4 11.5 12 4l8 7.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1z" />
